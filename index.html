@@ -2,553 +2,986 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charutos Baron</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meus Charutos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Estilo global para os campos de entrada e textarea */
-        input, textarea {
-            font-size: 16px; /* Tamanho de fonte igual para todos os campos */
-            line-height: 1.5; /* Controla o espaçamento entre as linhas */
-            padding: 8px; /* Ajusta o padding para melhorar a aparência */
-        }
-        
-        /* Se quiser definir tamanhos diferentes em casos específicos */
-        input {
-            font-size: 16px;
-        }
-        textarea {
-            font-size: 16px;  /* Certifique-se de que o tamanho é o mesmo */
-            height: 120px;  /* Ajuste a altura se necessário */
-        }
-                body {
-                    background-color: black;
-                    color: white;
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                }
-                .container {
-                    max-width: 600px;
-                    margin: 20px auto;
-                    padding: 20px;
-                    background-color: #000;
-                    border-radius: 10px;
-                }
-                input, textarea, button {
-                    width: 93%;
-                    padding: 10px;
-                    margin: 10px auto;
-                    display: block;
-                    background-color: #333;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 1em;
-                }
-                textarea {
-                    resize: none;
-                    height: 100px;
-                }
-                .row {
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 10px;
-                }
-                .row input {
-                    width: 48%;
-                }
-                ul {
-                    list-style: none;
-                    padding: 0;
-                }
-                li {
-                    margin: 10px 0;
-                    padding: 10px;
-                    background-color: #333;
-                    border-radius: 5px;
-                }
-                h2 {
-                    color: yellow;
-                    font-size: 1.2em;
-                    text-align: left;
-                    margin-bottom: 10px;
-                }
-                .yellow-text {
-                    color: yellow;
-                }
-                button:hover {
-                    background-color: #555;
-                }
-                .button-group {
-                    display: flex;
-                    gap: 10px;
-                }
-                .restore-button {
-                    background-color: green;
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                }
-                .delete-button {
-                    background-color: red;
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                }
-                .edit-button {
-                    background-color: #444;
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                }
-                .edit-button:hover {
-                    background-color: #555;
-                }
-                .logo {
-                    display: block;
-                    margin: 0 auto 20px;
-                    max-width: 100%;
-                }
-                .progress-container {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    margin-top: 10px;
-                }
-                .progress-bar {
-                    height: 10px;
-                    width: 50%;
-                    border-radius: 5px;
-                    display: flex;
-                }
-                .yellow {
-                    height: 100%;
-                    border-radius: 5px 0 0 5px;
-                }
-                .gray {
-                    height: 100%;
-                    border-radius: 0 5px 5px 0;
-                }
-                .separator {
-                    border-top: 1px solid #444;
-                    margin: 10px 0;
-                }
-                .country-text {
-                    color: lightgreen;
-                }
-                #deletedCount {
-                    color: white;
-                }
-                #importInput {
-                    display: none;
-                }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+	
+<div id="initialMessageModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white;">
+    <div style="background-color: #222; padding: 20px; border-radius: 10px; max-width: 306px; text-align: center; line-height: 1.0;">
+        <p>Bem-vindo! </p>
+        <p id="randomMessage" style="color: yellow;"></p>
+        <button id="closeInitialMessage" class="close-initial-button">Iniciar</button>
     </div>
-    <div class="container"> <img src="https://i.ibb.co/8XqkWF7/logo.png" alt="Logo Charutos Baron" class="logo">
-        <form id="cigarForm"> <input type="text" id="name" placeholder="Nome do Charuto" required> <input type="text" id="country" placeholder="País de Origem" required> <textarea id="description" placeholder="Avaliação" required></textarea>
-            <div class="row"> <input type="number" id="appearance" placeholder="Aparência (5-10)" min="5" max="10" required> <input type="number" id="burn" placeholder="Queima (5-10)" min="5" max="10" required> </div>
-            <div class="row"> <input type="number" id="aroma" placeholder="Aroma (5-10)" min="5" max="10" required> <input type="number" id="taste" placeholder="Gosto (5-10)" min="5" max="10" required> </div>
-        </form>
-        <div class="button-group"> <button type="submit" form="cigarForm"><i class="fas fa-save"></i> Salva</button> <button onclick="exportData()"><i class="fas fa-cloud-upload-alt"></i> Exporta</button> <button onclick="document.getElementById('importInput').click()"><i class="fas fa-cloud-download-alt"></i> Importa</button> </div> <input type="file" id="importInput" accept=".json" onchange="importData(event)" style="display: none;">
-        <ul id="cigarList"></ul>
-        <div class="separator" style="border-top: 2px solid #666; margin: 20px 0;"></div>
-        <h2>Charutos Excluídos (<span id="deletedCount">0</span>)</h2>
-        <ul id="deletedCigarList"></ul>
-    </div> <!-- Rodapé com link para abrir o modal -->
+</div>
+
+<div class="container"> 
+    <img src="https://i.ibb.co/p2QgH4W/1000112967-2.jpg" alt="Logo Charutos Baron" class="logo">
+
+    <form id="cigarForm" onsubmit="event.preventDefault(); validateForm()">
+        <input type="text" id="name" placeholder="Nome do Charuto" required>
+        <input type="text" id="country" placeholder="País de Origem" required>
+        <input type="text" id="description" placeholder="Avaliação" required>
+        <div class="row">
+            <input type="number" id="appearance" placeholder="Aparência (5-10)" min="5" max="10" required>
+            <input type="number" id="burn" placeholder="Queima (5-10)" min="5" max="10" required>
+        </div>
+        <div class="row">
+            <input type="number" id="aroma" placeholder="Aroma (5-10)" min="5" max="10" required>
+            <input type="number" id="taste" placeholder="Gosto (5-10)" min="5" max="10" required>
+        </div>
+    </form>
+
+    <div class="row">
+        <button type="submit" form="cigarForm"><i class="fas fa-save"></i> Salvar</button>
+        <button onclick="exportData()"><i class="fas fa-cloud-upload-alt"></i> Exportar</button>
+    </div>
+
+    <div class="row">
+        <button onclick="document.getElementById('importInput').click()"><i class="fas fa-cloud-download-alt"></i> Importar</button>
+        <button onclick="scrollToSection('deletedCigarList')"><i class="fa-solid fa-trash"></i> Excluídos</button>
+    </div>
+
+    <input type="file" id="importInput" accept=".json" onchange="importData(event)" style="display: none;">
+
+    <hr style="height: 17px; width: 50px; background-color: black; border: none; margin: auto;">
+    <div style="text-align: center;">
+        <img src="https://i.ibb.co/gSJ6jp2/1000113435.jpg" alt="Charutos" style="width: 150px; height: auto;">
+    </div>
+
+    <h2>
+        Charutos Favoritos: <span id="favoriteCount">0</span>
+        <img src="https://i.ibb.co/5BcqTXh/1000113562.png" alt="Imagem de charuto" style="width: 12%; height: auto; vertical-align: -1px;" />
+    </h2>
+
+    <ul id="favoriteCigarList"></ul>
+    
+    <hr style="height: 17px; width: 50px; background-color: black; border: none; margin: auto;">
+    <div style="text-align: center;">
+        <img src="https://i.ibb.co/gSJ6jp2/1000113435.jpg" alt="Charutos" style="width: 150px; height: auto;">
+    </div>
+
+    <h2>
+        Charutos Degustados: <span id="tastedCount">0</span>
+        <img src="https://i.ibb.co/5BcqTXh/1000113562.png" alt="Imagem de charuto" style="width: 12%; height: auto; vertical-align: -1px;" />
+    </h2>
+
+    <ul id="cigarList"></ul>
+
+    <hr style="height: 17px; width: 50px; background-color: black; border: none; margin: auto;">
+    <div style="text-align: center;">
+        <img src="https://i.ibb.co/gSJ6jp2/1000113435.jpg" alt="Charutos" style="width: 150px; height: auto;">
+    </div>
+    
+    <h2>
+        Charutos Excluídos: <span id="deletedCount">0</span>
+        <img src="https://i.ibb.co/5BcqTXh/1000113562.png" alt="Imagem de charuto" style="width: 12%; height: auto; vertical-align: -1px;" />
+    </h2>
+
+    <ul id="deletedCigarList"></ul>
+    <br>
+    <p class="scroll-to-top" onclick="scrollToTop()">Voltar ao Topo ↑ </p>
+
+    <!-- Rodapé -->
     <footer>
         <div class="footer-content">
-            <p style="font-size: 14px; line-height: 1.0;">Desenvolvido por <strong>José Augusto Baron</strong></p>
-            <p style="font-size: 14px; line-height: 1.0;">Email: <a href="mailto:jabaron@gmail.com">jabaron@gmail.com</a></p>
-            <p style="font-size: 14px; line-height: 1.0;">Licença: <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a></p>
-            <p style="font-size: 14px; line-height: 1.0;"><a href="https://github.com/joaubaron/CharutosBaron" target="_blank">GitHub</a></p> <br> <!-- Adiciona uma linha extra aqui -->
-            <p style="font-size: 14px; line-height: 1.0;"> <a href="#" id="showModalLink" style="color: yellow; text-decoration: none;">Nota importante</a> </p>
+            <a href="#" id="showModalLink" style="color: yellow; text-decoration: none;">Nota importante</a>
+            <p style="margin: 30px 0;"></p>
+            <a href="https://www.pipesmoking360.com" target="_blank">
+                <img src="https://i.ibb.co/FmzbSqB/1000114659.jpg" alt="Pipesmoking360" style="max-width: 170px; height: auto;">
+            </a>
+            <p style="color: white; line-height: 1.0; margin: 0;">Tabacaria especializada em tabacos, charutos e cachimbos.</p>
         </div>
-    </footer> <!-- Modal de boas-vindas (inicialmente oculto) -->
-    <div id="welcomeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white;">
-        <div style="background-color: #222; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center; line-height: 1.6;">
-            <p>Ferramenta prática e funcional para entusiastas de charutos organizarem suas experiências.</p>
-            <p><strong style="color: yellow;">Atenção:</strong> As informações são salvas localmente. Recomendo exportar os dados periodicamente e salvá-los em segurança para evitar perdas.</p>
-            <p>Muito obrigado por usar essa ferramenta e curta essa jornada no mundo dos charutos!</p> <button id="closeModal" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;">Entendi</button>
+    </footer>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content" style="background-color: #222; color: white;">
+            <p style="line-height: 1.0;">Organize sua experiência com charutos de maneira prática e bem organizada.</p>
+            <p style="line-height: 1.0;">
+                <span style="color: yellow;">Atenção:</span> Seus dados são armazenados localmente neste dispositivo e podem ser perdidos. Para evitar problemas, é recomendado exportá-los periodicamente.
+            </p>
+            <p style="line-height: 1.0; color: yellow; margin: 0;">Copyright © 2025</p>
+            <p style="line-height: 1.0; color: white; margin: 0;">Criado e desenvolvido por José Augusto Baron. Todos os direitos reservados.</p>
+            <button class="close-btn" id="closeModalBtn" style="background-color: green; color: white; margin-top: 20px;">Entendi</button>
         </div>
-        </footer>
-        <style>
-            input, select, textarea {
-              font-size: 16px; /* Ajuste para o tamanho desejado */
-            }
-            
-                footer p {
-                    line-height: 0.8;    /* Diminui o espaçamento entre as linhas dos parágrafos */
-                    margin-bottom: 5px;  /* Diminui a margem entre os parágrafos */
-                }
-                footer a {
-                    line-height: 0.8;    /* Diminui o espaçamento entre as linhas dos links */
-                }
-                footer strong {
-                    line-height: 0.8;    /* Diminui o espaçamento entre as linhas do texto em negrito */
-                }
-            .cigar-section {
-                margin-bottom: 30px; /* Espaçamento entre as seções */
-            }
-            .cigar-section h2 {
-                color: #f0f0f0; /* Cor de texto mais suave para os títulos */
-                font-size: 1.2em;
-                text-align: left;
-                margin-bottom: 10px;
-                padding-bottom: 5px;
-                border-bottom: 2px solid #444; /* Linha sutil abaixo do título */
-            }
-            .separator {
-                border-top: 1px solid #444;
-                margin: 20px 0;
-            }
-            /* Estilo para a lista de charutos excluídos, um pouco mais destacado */
-            #deletedCigarList {
-                background-color: #222; /* Fundo mais escuro para a lista de excluídos */
-                border-radius: 10px;
-                padding: 10px;
-            }
-            #deletedCigarList li {
-                background-color: #333; /* Cor de fundo das entradas */
-                margin: 10px 0;
-                border-radius: 5px;
-                padding: 10px;
-            }
-                body {
-                    background-color: #1a1a1a;  /* Fundo mais suave para combinar com o rodapé */
-                    color: #f0f0f0;  /* Cor de texto mais suave para contraste com fundo */
-                    font-family: 'Roboto', sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    flex-direction: column;
-                    min-height: 100vh;
-                }
-                .container {
-                    flex: 1; /* Isso faz o conteúdo ocupar o espaço restante, empurrando o rodapé para o final */
-                }
-                footer {
-                background-color: #121212;  /* Fundo escuro para destacar o conteúdo do rodapé */
-                color: #f0f0f0;
-                padding: 15px 0;  /* Pequeno ajuste para um espaço mais confortável */
-                text-align: center;
-                width: 100%;
-                font-size: 0.9em;  /* Leve aumento do tamanho da fonte */
-                box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3);  /* Sombra mais suave para profundidade */
-                position: relative;
-                bottom: 0;
-                border-top: 1px solid #333;  /* Linha sutil no topo do rodapé */
-            }
-            
-            .footer-content {
-                max-width: 900px;  /* Limita a largura para um conteúdo mais compacto */
-                margin: 0 auto;  /* Centraliza o conteúdo */
-                padding: 0 20px;  /* Adiciona padding para espaçamento nas laterais */
-            }
-            
-            .footer-content p {
-                margin: 8px 0;  /* Ajuste de margem para melhorar o espaçamento */
-                font-weight: normal;
-                line-height: 1.5;  /* Aumenta o espaçamento entre linhas para melhor legibilidade */
-            }
-            .footer-content a {
-                color: #1db954;  /* Cor vibrante para links */
-                text-decoration: none;
-                font-weight: 500;  /* Leve destaque no peso da fonte */
-                transition: color 0.3s ease, transform 0.3s ease;  /* Suaviza a transição de cor e adição de efeito de transformação */
-            }
-            .footer-content a:hover {
-                color: #1ed760;  /* Cor de hover mais brilhante */
-                text-decoration: underline;
-                transform: translateY(-2px);  /* Efeito de "elevação" no hover para mais interatividade */
-            }
-            footer p {
-                font-size: 1em;
-                color: #ccc;  /* Cor mais suave para o texto, mantendo a hierarquia */
-            }
-            footer strong {
-                color: #ffcc00;  /* Nome do desenvolvedor com destaque dourado */
-                font-weight: 700;  /* Maior peso para maior destaque */
-            }
-            footer a {
-                font-size: 1em;  /* Tamanho de fonte para os links no rodapé */
-                color: #f0f0f0;  /* Cor neutra para os links principais */
-            }
-            footer a:hover {
-                color: #1ed760;  /* Efeito de hover com cor suave e transição */
-            }
-        </style>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                    const modal = document.getElementById('welcomeModal');
-                    const closeModal = document.getElementById('closeModal');
-                    const showModalLink = document.getElementById('showModalLink');
-            
-                    // Garantir que o modal esteja inicialmente oculto
-                    modal.style.display = 'none'; // Isso assegura que o modal não será exibido ao carregar a página.
-            
-                    // Exibe o modal ao clicar no link "Mais informações"
-                    showModalLink.addEventListener('click', function(event) {
-                        event.preventDefault();  // Impede o comportamento padrão do link
-                        modal.style.display = 'flex';  // Exibe o modal
-                    });
-            
-                    // Fecha o modal ao clicar no botão "Entendi"
-                    closeModal.addEventListener('click', function() {
-                        modal.style.display = 'none';  // Oculta o modal
-                    });
-                });
+    </div>
+</div>
+
+<style>
+    /* Estilização do modal */
+    .modal {
+        display: none; /* Modal inicialmente oculto */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9); /* Fundo escuro e opaco */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #222 !important; /* Fundo cinza escuro com prioridade */
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content p:first-of-type span {
+        color: yellow; /* "Atenção" em amarelo */
+    }
+
+    .close-btn {
+        background-color: #444;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    a {
+        color: yellow;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #cigarForm input {
+        font-size: 18px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 7px;
+        font-size: 18px;
+    }
+
+    #tastedCount {
+        color: white;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 18px;
+        line-height: 1.5;
+        padding: 10px;
+        border: 2px solid #444;
+        border-radius: 10px;
+        background-color: #1a1a1a;
+        color: white;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: yellow;
+        box-shadow: 0 0 8px yellow;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: #777;
+    }
+
+    body {
+        font-size: 18px;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 10px;
+    }
+
+    body {
+        background-color: black;
+        color: white;
+        font-family: 'Lato', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 10px auto;
+        padding: 10px;
+        background-color: #000;
+        border-radius: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+        .container {
+            width: 90%;
+            padding: 20px;
+        }
+
+        input,
+        textarea,
+        button {
+            width: 95%;
+            padding: 10px;
+            margin: 4px auto;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        textarea {
+            resize: none;
+            height: 60px;
+        }
+
+        .row input {
+            width: 48%;
+        }
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #333;
+        border-radius: 5px;
+    }
+
+    h2 {
+        color: yellow;
+        font-size: 1.23em;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    .yellow-text {
+        color: yellow;
+    }
+
+    button:hover {
+        background-color: #555;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .restore-button {
+        background-color: green;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .delete-button {
+        background-color: red;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .edit-button {
+        background-color: #444;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .logo {
+        display: block;
+        margin: 0 auto 10px;
+        max-width: 100%;
+    }
+
+    .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .progress-bar {
+        height: 10px;
+        width: 52%;
+        border-radius: 5px;
+        display: flex;
+    }
+
+    .yellow {
+        height: 100%;
+        border-radius: 5px 0 0 5px;
+    }
+
+    .gray {
+        height: 100%;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .country-text {
+        color: lightgreen;
+    }
+
+    #deletedCount {
+        color: white;
+    }
+
+    #importInput {
+        display: none;
+    }
+
+    .scroll-to-top {
+        color: yellow;
+        font-size: 1.23em;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    #description {
+        height: 60px;
+    }
+
+    #initialMessageModal > div {
+        margin-top: calc(20% + 20px);
+    }
+
+    .close-initial-button {
+        padding: 10px 20px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .close-initial-button:hover {
+        background-color: darkgreen;
+    }
+
+    #initialMessageModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        overflow: hidden;
+    }
+
+    input,
+    textarea {
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 8px;
+    }
+
+    previous-element {
+        padding-right: 20px;
+    }
+
+    .star-icon {
+        cursor: pointer;
+        font-size: 1.5em;
+        color: gray;
+        margin-left: 20px;
+    }
+
+    .star-icon.favorited {
+        color: yellow;
+    }
+
+    footer p {
+        line-height: 0.8;
+        margin-bottom: 5px;
+    }
+
+    footer a {
+        line-height: 0.8;
+    }
+
+    footer strong {
+        line-height: 0.8;
+    }
+
+    .cigar-section {
+        margin-bottom: 30px;
+    }
+
+    .cigar-section h2 {
+        color: #f0f0f0;
+        font-size: 1.2em;
+        text-align: left;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #222;
+    }
+
+    .separator {
+        border-top: 3px solid #222;
+        margin: 20px 0;
+    }
+
+    #deletedCigarList {
+        background-color: #222;
+        border-radius: 10px;
+    }
+
+    #deletedCigarList li {
+        background-color: #333;
+        margin: 10px 0;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    body {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .container {
+        flex: 1;
+    }
+
+    footer {
+        background-color: #121212;
+        color: #f0f0f0;
+        padding: 15px 0;
+        text-align: center;
+        width: 100%;
+        font-size: 0.9em;
+        box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        bottom: 0;
+        border-top: 1px solid #333;
+    }
+
+    .footer-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .footer-content p {
+        margin: 8px 0;
+        font-weight: normal;
+        line-height: 1.5;
+    }
+
+    .footer-content a {
+        color: #1db954;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .footer-content a:hover {
+        color: #1ed760;
+        text-decoration: underline;
+        transform: translateY(-2px);
+    }
+
+    footer strong {
+        color: #ffcc00;
+        font-weight: 700;
+    }
+
+    footer a {
+        font-size: 1em;
+        color: #f0f0f0;
+    }
+
+    footer a:hover {
+        color: #1ed760;
+    }
+
+    #favoriteCount {
+        color: white;
+    }
+
+    /* Campos aparência, queima, aroma e gosto */
+    .field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .field label {
+        font-size: 1.2em;
+        color: white;
+        width: 100px;
+    }
+
+    .field input[type="range"] {
+        width: 70%;
+        background: #444;
+        border: none;
+        border-radius: 5px;
+        height: 10px;
+        outline: none;
+    }
+
+    .field input[type="range"]::-webkit-slider-runnable-track {
+        background: #666;
+    }
+
+    .field input[type="range"]::-webkit-slider-thumb {
+        background: yellow;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+    }
+
+    .field input[type="range"]:focus {
+        outline: none;
+    }
+
+    .field span {
+        font-size: 1.2em;
+        color: white;
+    }
+</style>
                 
-                function updateCigarStatus(id, status) {
-                const cigars = getCigars();
-                const cigar = cigars.find(c => c.id === id);
-                if (cigar) {
-                    cigar.deleted = status;
-                    saveCigars(cigars);
-                    displayCigars();
-                }
+               <script>
+    // Seleciona os elementos
+    const modal = document.getElementById("myModal");
+    const showModalLink = document.getElementById("showModalLink");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    // Mostra o modal quando o link é clicado
+    showModalLink.addEventListener("click", (event) => {
+        event.preventDefault(); // Previne o comportamento padrão do link
+        modal.style.display = "flex"; // Exibe o modal com flexbox para centralizar
+    });
+
+    // Fecha o modal ao clicar no botão "Sair"
+    closeModalBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    const messages = [
+        "Rum e charutos acalmam a alma, reflexos de paz e harmonia eternos.",
+        "Um bom charuto é um amigo que ensina algo valioso a cada momento.",
+        "Fumar charuto é relaxar com estilo, deixando o tempo passar devagar.",
+        "Charutos não precisam de razão, apenas de um momento perfeito.",
+        "A vida é curta demais para gastar com charutos ruins e amargos.",
+        "Um bom charuto é um prazer que se saboreia lentamente e cuidadosamente.",
+        "Charutos trazem conversas e histórias guardadas no tempo distante.",
+        "Fumar charuto é como fazer uma pausa merecida na rotina diária.",
+        "Cada charuto carrega uma história fascinante esperando para ser contada.",
+        "Nada se compara ao prazer inigualável de escolher o charuto ideal.",
+        "Charuto é o parceiro perfeito para reflexões solitárias e profundas.",
+        "A verdadeira riqueza é saborear charutos com bons e leais amigos.",
+        "Um charuto é uma poesia envolta em folhas de tabaco envelhecido.",
+        "Charutos têm o aroma tranquilo da calma e do momento perfeito.",
+        "Fumar charuto é viver o momento com cada tragada lenta e pensativa.",
+        "Os grandes momentos da vida são medidos em charutos únicos e especiais.",
+        "Charutos são paz e prazer embrulhados na fumaça do instante fugaz.",
+        "Fumar charuto é narrar histórias em silêncios contemplativos e profundos.",
+        "O charme do charuto está nos detalhes da fumaça sutil e delicada.",
+        "Charuto é o convite perfeito para desacelerar e viver mais plenamente.",
+        "Charutos são aliados dos pensamentos em noites solitárias e silenciosas.",
+        "Fumar charuto é uma pausa bem-vinda no turbilhão frenético do dia.",
+        "Com charutos, o tempo desacelera, e a vida ganha leveza e clareza.",
+        "Charutos e momentos bons são feitos para a calmaria lenta e duradoura.",
+        "O prazer de um charuto vai além do que se pode provar fisicamente.",
+        "Charuto e café são o duo perfeito para boas e profundas reflexões.",
+        "Fumar charuto é uma conversa sem palavras com o vasto universo.",
+        "Charuto é o abraço tranquilo para uma mente cansada e viva novamente.",
+        "Charutos e amigos transformam qualquer instante em memória eterna."
+    ];
+
+    // Função para selecionar uma mensagem aleatória
+    function getRandomMessage() {
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        return messages[randomIndex];
+    }
+
+    // Exibindo uma mensagem aleatória quando o modal aparecer
+    document.getElementById('randomMessage').innerText = getRandomMessage();
+
+    // Função para rolar até o topo da página
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Seleciona os elementos do modal inicial (boas-vindas)
+        const initialModal = document.getElementById('initialMessageModal'); 
+        const closeInitialModal = document.getElementById('closeInitialMessage');
+        const hasSeenInitialMessage = localStorage.getItem('hasSeenInitialMessage');
+
+        // Seleciona os elementos do modal "Nota Importante"
+        const closeImportantModal = document.getElementById('closeModal');
+        const showImportantLink = document.getElementById('showModalLink');
+
+        // Fecha o modal inicial e salva no localStorage que ele foi visto
+        closeInitialModal.addEventListener('click', function () {
+            initialModal.style.display = 'none';
+            localStorage.setItem('hasSeenInitialMessage', 'true');
+        });
+    });
+
+    let currentEditId = null;
+
+    document.getElementById('cigarForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        addCigar();
+    });
+
+    function getCigars() {
+        return JSON.parse(localStorage.getItem('cigars')) || [];
+    }
+
+    function saveCigars(cigars) {
+        localStorage.setItem('cigars', JSON.stringify(cigars));
+    }
+
+    // Adiciona um novo charuto ou edita um existente
+    function addCigar() { 
+        const name = document.getElementById('name').value.trim();
+        const country = document.getElementById('country').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const appearance = parseInt(document.getElementById('appearance').value);
+        const burn = parseInt(document.getElementById('burn').value);
+        const aroma = parseInt(document.getElementById('aroma').value);
+        const taste = parseInt(document.getElementById('taste').value);
+        const average = ((appearance + burn + aroma + taste) / 4).toFixed(1);
+        const cigars = getCigars();
+        let newCigarId;
+
+        // Editar ou adicionar novo charuto
+        if (currentEditId) {
+            const cigarIndex = cigars.findIndex(c => c.id === currentEditId);
+            if (cigarIndex !== -1) {
+                cigars[cigarIndex] = {
+                    id: currentEditId,
+                    name,
+                    country,
+                    description,
+                    appearance,
+                    burn,
+                    aroma,
+                    taste,
+                    average: parseFloat(average),
+                    deleted: false
+                };
             }
-            
-            document.addEventListener('DOMContentLoaded', function() {
-                const modal = document.getElementById('welcomeModal');
-                const closeModal = document.getElementById('closeModal');
-                const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
-            
-                // Verifica se o modal já foi exibido anteriormente
-                if (!hasSeenModal) {
-                    modal.style.display = 'flex'; // Mostra o modal
-                }
-            
-                // Fecha o modal e salva no localStorage que ele já foi visto
-                closeModal.addEventListener('click', function() {
-                    modal.style.display = 'none';
-                    localStorage.setItem('hasSeenWelcomeModal', 'true');
-                });
+            newCigarId = currentEditId;
+            currentEditId = null;
+        } else {
+            newCigarId = Date.now();
+            cigars.push({
+                id: newCigarId,
+                name,
+                country,
+                description,
+                appearance,
+                burn,
+                aroma,
+                taste,
+                average: parseFloat(average),
+                deleted: false
             });
-            
-            
-                    let currentEditId = null;
-                    document.getElementById('cigarForm').addEventListener('submit', function(event) {
-                        event.preventDefault();
-                        addCigar();
-                    });
-                    function getCigars() {
-                        return JSON.parse(localStorage.getItem('cigars')) || [];
-                    }
-                    function saveCigars(cigars) {
-                        localStorage.setItem('cigars', JSON.stringify(cigars));
-                    }
-                    function addCigar() {
-                        const name = document.getElementById('name').value.trim();
-                        const country = document.getElementById('country').value.trim();
-                        const description = document.getElementById('description').value.trim();
-                        const appearance = parseInt(document.getElementById('appearance').value);
-                        const burn = parseInt(document.getElementById('burn').value);
-                        const aroma = parseInt(document.getElementById('aroma').value);
-                        const taste = parseInt(document.getElementById('taste').value);
-                        const average = ((appearance + burn + aroma + taste) / 4).toFixed(1);
-                        const cigars = getCigars();
-                        if (currentEditId) {
-                            const cigarIndex = cigars.findIndex(c => c.id === currentEditId);
-                            if (cigarIndex !== -1) {
-                                cigars[cigarIndex] = {
-                                    id: currentEditId,
-                                    name,
-                                    country,
-                                    description,
-                                    appearance,
-                                    burn,
-                                    aroma,
-                                    taste,
-                                    average: parseFloat(average),
-                                    deleted: false
-                                };
-                            }
-                            currentEditId = null;
+        }
+
+        saveCigars(cigars);
+
+        // Usa MutationObserver para garantir que a lista foi atualizada
+        const cigarList = document.getElementById('cigarList');
+        const observer = new MutationObserver(() => {
+            const newItem = document.querySelector(`#cigarList li[data-id='${newCigarId}']`);
+            if (newItem) {
+                newItem.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                observer.disconnect(); // Para o observer após encontrar o item
+            }
+        });
+
+        observer.observe(cigarList, {
+            childList: true,
+            subtree: true
+        });
+
+        // Atualiza a interface
+        displayCigars();
+
+        // Reseta o formulário
+        document.getElementById('cigarForm').reset();
+    }
+
+    function displayCigars() {
+        const cigars = getCigars();
+        const cigarList = document.getElementById('cigarList');
+        const favoriteList = document.getElementById('favoriteCigarList');
+        const favoriteCount = document.getElementById('favoriteCount');
+        const deletedCigarList = document.getElementById('deletedCigarList');
+        const deletedCount = document.getElementById('deletedCount');
+        cigarList.innerHTML = '';
+        favoriteList.innerHTML = '';
+        deletedCigarList.innerHTML = '';
+
+        // Separa os charutos entre avaliados, favoritos e excluídos
+        const favorites = cigars.filter(c => c.favorite && !c.deleted);
+        const evaluated = cigars.filter(c => !c.favorite && !c.deleted);
+        const deleted = cigars.filter(c => c.deleted);
+
+        // Atualizar o contador de charutos degustados
+        const tastedCount = document.getElementById('tastedCount');
+        tastedCount.textContent = evaluated.length;
+
+        // Ordena a lista de charutos avaliados em ordem decrescente
+        const sortedEvaluated = evaluated.sort((a, b) => b.average - a.average);
+
+        // Ordena os favoritos em ordem decrescente
+        const sortedFavorites = favorites.sort((a, b) => b.average - a.average);
+
+        // Renderizar charutos avaliados
+        renderCigarList(sortedEvaluated, cigarList);
+
+        // Renderizar charutos favoritos
+        renderCigarList(sortedFavorites, favoriteList, false);
+
+        const deletedCigars = cigars.filter(c => c.deleted);
+        deletedCigars.forEach(cigar => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>${cigar.name}</strong> - <span class="country-text">${cigar.country}</span><br>
+                <span class="yellow-text">Avaliação: ${cigar.average}</span>
+                <div class="button-group">
+                    <button class="restore-button" onclick="restoreCigar(${cigar.id})"><i class="fas fa-undo"></i> Restaurar</button>
+                    <button class="delete-button" onclick="confirmDelete(${cigar.id})"><i class="fas fa-trash"></i> Excluir Permanentemente</button>
+                </div>
+            `;
+            deletedCigarList.appendChild(li);
+        });
+
+        // Atualiza os contadores
+        favoriteCount.textContent = favorites.length;
+        deletedCount.textContent = deleted.length;
+    }
+
+    function renderCigarList(cigars, container, includeButtons = true) {
+        container.innerHTML = ''; // Limpa a lista antes de renderizar
+        cigars.forEach(cigar => {
+            const li = document.createElement('li');
+            li.setAttribute('data-id', cigar.id);
+            li.innerHTML = `
+                <strong>${cigar.name}</strong> - <span class="country-text">${cigar.country}</span><br>
+                <span class="yellow-text">Avaliação: ${cigar.average}</span>
+                <i class="fas fa-star star-icon ${cigar.favorite ? 'favorited' : ''}" onclick="toggleFavorite(${cigar.id})"></i>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="yellow" style="width: ${(cigar.average - 5) * 20}%; background-color: yellow;"></div>
+                        <div class="gray" style="width: ${(10 - cigar.average) * 20}%; background-color: gray;"></div>
+                    </div>
+                </div>
+                <div class="separator"></div>
+                ${cigar.description}
+                ${includeButtons ? `
+                    <div class="button-group">
+                        <button class="edit-button" onclick="editCigar(${cigar.id})"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="delete-button" onclick="deleteCigar(${cigar.id})"><i class="fas fa-trash"></i> Excluir</button>
+                    </div>
+                ` : ''}
+            `;
+            container.appendChild(li);
+        });
+    }
+
+    function deleteCigar(id) {
+        const cigars = getCigars();
+        const cigarIndex = cigars.findIndex(c => c.id === id);
+        if (cigarIndex !== -1) {
+            cigars[cigarIndex].deleted = true;
+            saveCigars(cigars);
+            displayCigars();
+            // Rolar para a seção "Charutos Excluídos"
+            const deletedSection = document.getElementById('deletedCigarList');
+            window.scrollTo({
+                top: deletedSection.offsetTop - 50, // Ajuste conforme necessário
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    function restoreCigar(id) {
+        const cigars = getCigars();
+        const cigarIndex = cigars.findIndex(c => c.id === id);
+        if (cigarIndex !== -1) {
+            cigars[cigarIndex].deleted = false;
+            saveCigars(cigars);
+            displayCigars();
+        }
+    }
+
+    function confirmDelete(id) {
+        const confirmed = window.confirm("Você quer mesmo excluir permanentemente este charuto?");
+        if (confirmed) {
+            const cigars = getCigars();
+            const cigarIndex = cigars.findIndex(c => c.id === id);
+            if (cigarIndex !== -1) {
+                cigars.splice(cigarIndex, 1);
+                saveCigars(cigars);
+                displayCigars();
+            }
+        }
+    }
+
+    function exportData() {
+        const cigars = getCigars();
+        const dataStr = JSON.stringify(cigars);
+        const blob = new Blob([dataStr], {
+            type: "application/json"
+        });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "meuscharutos.json";
+        link.click();
+    }
+
+                    function importData(event) {
+                        const file = event.target.files[0];
+
+                        // Verificar o tipo do arquivo
+                        if (file && file.type === 'application/json') {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                try {
+                                    const importedData = JSON.parse(e.target.result);
+
+                                    // Verificar se o JSON é um array
+                                    if (!Array.isArray(importedData)) {
+                                        alert("O arquivo JSON não está no formato esperado. Deve ser um array de charutos.");
+                                        return;
+                                    }
+
+                                    // Verificar se cada item no array tem as propriedades necessárias
+                                    const isValidFormat = importedData.every(cigar =>
+                                        cigar.hasOwnProperty('id') &&
+                                        cigar.hasOwnProperty('name') &&
+                                        cigar.hasOwnProperty('country') &&
+                                        cigar.hasOwnProperty('description') &&
+                                        cigar.hasOwnProperty('appearance') &&
+                                        cigar.hasOwnProperty('burn') &&
+                                        cigar.hasOwnProperty('aroma') &&
+                                        cigar.hasOwnProperty('taste') &&
+                                        cigar.hasOwnProperty('average') &&
+                                        cigar.hasOwnProperty('deleted')
+                                    );
+
+                                    if (!isValidFormat) {
+                                        alert("O arquivo JSON está no formato incorreto. Cada charuto deve ter as propriedades esperadas.");
+                                        return;
+                                    }
+
+                                    // Se a validação passar, salvar os dados
+                                    saveCigars(importedData);
+                                    displayCigars();
+                                } catch (error) {
+                                    alert("Erro ao processar o arquivo JSON. Verifique o formato do arquivo.");
+                                }
+                            };
+                            reader.readAsText(file);
                         } else {
-                            cigars.push({
-                                id: Date.now(),
-                                name,
-                                country,
-                                description,
-                                appearance,
-                                burn,
-                                aroma,
-                                taste,
-                                average: parseFloat(average),
-                                deleted: false
+                            // Exibir um alerta caso o arquivo não seja JSON
+                            alert("Selecione um arquivo .json");
+                        }
+                    }
+                    displayCigars();
+
+                    function editCigar(id) {
+                        const cigars = getCigars();
+                        const cigar = cigars.find(c => c.id === id);
+                        if (cigar) {
+                            document.getElementById('name').value = cigar.name;
+                            document.getElementById('country').value = cigar.country;
+                            document.getElementById('description').value = cigar.description;
+                            document.getElementById('appearance').value = cigar.appearance;
+                            document.getElementById('burn').value = cigar.burn;
+                            document.getElementById('aroma').value = cigar.aroma;
+                            document.getElementById('taste').value = cigar.taste;
+                            currentEditId = cigar.id; // Armazena o ID para editar depois
+
+                            // Rolar suavemente até a seção de edição
+                            window.scrollTo({
+                                top: 390, // Rolar até o topo
+                                behavior: 'smooth' // Efeito de rolagem suave
                             });
                         }
-                        saveCigars(cigars);
-                        displayCigars();
-                        document.getElementById('cigarForm').reset();
+                        // Função chamada após o arquivo ser selecionado para importação
                     }
-                    function displayCigars() {
+
+                    function toggleFavorite(id) {
                         const cigars = getCigars();
-                        const cigarList = document.getElementById('cigarList');
-                        const deletedCigarList = document.getElementById('deletedCigarList');
-                        const deletedCount = document.getElementById('deletedCount');
-                        cigarList.innerHTML = '';
-                        deletedCigarList.innerHTML = '';
-                        const sortedCigars = cigars.filter(c => !c.deleted).sort((a, b) => b.average - a.average);
-                        sortedCigars.forEach(cigar => {
-                            const progressBarWidthYellow = ((cigar.average - 5) / 5) * 100;
-                            const progressBarWidthGray = 100 - progressBarWidthYellow;
-                            const li = document.createElement('li');
-                            li.innerHTML = `
-                                <strong>${cigar.name}</strong> - <span class="country-text">${cigar.country}</span><br>
-                                <span class="yellow-text">Avaliação: ${cigar.average}</span>
-                                <div class="progress-container">
-                                    <div class="progress-bar">
-                                        <div class="yellow" style="width: ${progressBarWidthYellow}%; background-color: yellow;"></div>
-                                        <div class="gray" style="width: ${progressBarWidthGray}%; background-color: gray;"></div>
-                                    </div>
-                                </div>
-                                <div class="separator"></div>
-                                ${cigar.description}<br>
-                                <div class="button-group">
-                                    <button class="edit-button" onclick="editCigar(${cigar.id})"><i class="fas fa-edit"></i> Editar</button>
-                                    <button class="delete-button" onclick="deleteCigar(${cigar.id})"><i class="fas fa-trash"></i> Excluir</button>
-                                </div>
-                            `;
-                            cigarList.appendChild(li);
-                        });
-                        const deletedCigars = cigars.filter(c => c.deleted);
-                        deletedCigars.forEach(cigar => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `
-                                <strong>${cigar.name}</strong> - <span class="country-text">${cigar.country}</span><br>
-                                <span class="yellow-text">Avaliação: ${cigar.average}</span>
-                                <div class="button-group">
-                                    <button class="restore-button" onclick="restoreCigar(${cigar.id})"><i class="fas fa-undo"></i> Restaurar</button>
-                                    <button class="delete-button" onclick="confirmDelete(${cigar.id})"><i class="fas fa-trash"></i> Excluir Permanentemente</button>
-                                </div>
-                            `;
-                            deletedCigarList.appendChild(li);
-                        });
-                        deletedCount.textContent = deletedCigars.length;
-                    }
-                function deleteCigar(id) {
-                const cigars = getCigars();
-                const cigarIndex = cigars.findIndex(c => c.id === id);
-                if (cigarIndex !== -1) {
-                    cigars[cigarIndex].deleted = true;
-                    saveCigars(cigars);
-                    displayCigars();
-                    // Rolar para a seção "Charutos Excluídos"
-                    const deletedSection = document.getElementById('deletedCigarList');
-                    window.scrollTo({
-                        top: deletedSection.offsetTop - 50, // Ajuste conforme necessário
-                        behavior: 'smooth'
-                    });
-                }
-            }
-                    function restoreCigar(id) {
-                        const cigars = getCigars();
-                        const cigarIndex = cigars.findIndex(c => c.id === id);
-                        if (cigarIndex !== -1) {
-                            cigars[cigarIndex].deleted = false;
-                            saveCigars(cigars);
-                            displayCigars();
-                        }
-                    }
-                    function confirmDelete(id) {
-                        const confirmed = window.confirm("Você quer mesmo excluir permanentemente este charuto?");
-                        if (confirmed) {
-                            const cigars = getCigars();
-                            const cigarIndex = cigars.findIndex(c => c.id === id);
-                            if (cigarIndex !== -1) {
-                                cigars.splice(cigarIndex, 1);
-                                saveCigars(cigars);
-                                displayCigars();
+                        const cigar = cigars.find(c => c.id === id);
+
+                        if (cigar) {
+                            cigar.favorite = !cigar.favorite; // Alterna o status de favorito
+                            saveCigars(cigars); // Salva os dados no localStorage
+                            displayCigars(); // Atualiza as listas
+
+                            if (cigar.favorite) {
+                                // Aguarda a lista de favoritos ser renderizada e rola até o item
+                                setTimeout(() => {
+                                    const favoriteItem = document.querySelector(`#favoriteCigarList li[data-id='${id}']`);
+                                    if (favoriteItem) {
+                                        favoriteItem.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center'
+                                        });
+                                    }
+                                }, 100); // Atraso para garantir que a lista foi atualizada
                             }
                         }
                     }
-                    function exportData() {
-                        const cigars = getCigars();
-                        const dataStr = JSON.stringify(cigars);
-                        const blob = new Blob([dataStr], { type: "application/json" });
-                        const link = document.createElement("a");
-                        link.href = URL.createObjectURL(blob);
-                        link.download = "meuscharutos.json";
-                        link.click();
-                    }
-                    function importData(event) {
-                const file = event.target.files[0];
-            
-                // Verificar o tipo do arquivo
-                if (file && file.type === 'application/json') {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const importedData = JSON.parse(e.target.result);
-                            
-                            // Verificar se o JSON é um array
-                            if (!Array.isArray(importedData)) {
-                                alert("O arquivo JSON não está no formato esperado. Deve ser um array de charutos.");
-                                return;
-                            }
-            
-                            // Verificar se cada item no array tem as propriedades necessárias
-                            const isValidFormat = importedData.every(cigar => 
-                                cigar.hasOwnProperty('id') &&
-                                cigar.hasOwnProperty('name') &&
-                                cigar.hasOwnProperty('country') &&
-                                cigar.hasOwnProperty('description') &&
-                                cigar.hasOwnProperty('appearance') &&
-                                cigar.hasOwnProperty('burn') &&
-                                cigar.hasOwnProperty('aroma') &&
-                                cigar.hasOwnProperty('taste') &&
-                                cigar.hasOwnProperty('average') &&
-                                cigar.hasOwnProperty('deleted')
-                            );
-            
-                            if (!isValidFormat) {
-                                alert("O arquivo JSON está no formato incorreto. Cada charuto deve ter as propriedades esperadas.");
-                                return;
-                            }
-            
-                            // Se a validação passar, salvar os dados
-                            saveCigars(importedData);
-                            displayCigars();
-                        } catch (error) {
-                            alert("Erro ao processar o arquivo JSON. Verifique o formato do arquivo.");
+
+                    function scrollToSection(sectionId) {
+                        const section = document.getElementById(sectionId);
+                        if (section) {
+                            section.scrollIntoView({
+                                behavior: 'smooth'
+                            });
                         }
-                    };
-                    reader.readAsText(file);
-                } else {
-                    // Exibir um alerta caso o arquivo não seja JSON
-                    alert("Selecione um arquivo .json");
-                }
-            }
-                    displayCigars();
-                    
-                    function editCigar(id) {
-                const cigars = getCigars();
-                const cigar = cigars.find(c => c.id === id);
-                if (cigar) {
-                    document.getElementById('name').value = cigar.name;
-                    document.getElementById('country').value = cigar.country;
-                    document.getElementById('description').value = cigar.description;
-                    document.getElementById('appearance').value = cigar.appearance;
-                    document.getElementById('burn').value = cigar.burn;
-                    document.getElementById('aroma').value = cigar.aroma;
-                    document.getElementById('taste').value = cigar.taste;
-                    currentEditId = cigar.id; // Armazena o ID para editar depois
-            
-                    // Rolar suavemente até a seção de edição
-                    window.scrollTo({
-                        top: 390,  // Rolar até o topo
-                        behavior: 'smooth'  // Efeito de rolagem suave
-                    });
-                }
-                // Função chamada após o arquivo ser selecionado para importação
-            }
-        </script>       
+                    }
+</script>
 </body>
 </html>
